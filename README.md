@@ -1,1 +1,1 @@
-# pb
+# lightweight pastebin using go
