@@ -2,6 +2,8 @@ package pb
 
 import (
 	"context"
+	"time"
+	"unsafe"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -26,7 +28,17 @@ func initRedisDB() {
     }
 }
 
+func setV(key string, value []byte) (err error) {
+    err = rdb.Set(ctx, key, unsafe.String(&value[0], len(value)), time.Hour * 24 * 5).Err()
+    return
+}
 
+func getV(key string) (value string, err error) {
+    strcmd := rdb.Get(ctx, key)
+    value = strcmd.Val()
+    err = strcmd.Err()
+    return
+}
 
 
 
