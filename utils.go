@@ -27,8 +27,8 @@ func initLog() {
     } 
     myLog.SetFormatter(&logrus.TextFormatter{
         ForceColors: true,
-        ForceQuote:true,    
-        TimestampFormat:"2006-01-02 15:04:05",  
+        ForceQuote: true,    
+        TimestampFormat: "2006-01-02 15:04:05",  
         FullTimestamp:true,    
 	})
 }
