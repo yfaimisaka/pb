@@ -1,26 +1,46 @@
-package pb
+package main
 
 import (
+	"errors"
 	"testing"
 )
 
 func TestInitRedisDB(t *testing.T) {
-    initRedisDB()
+	initRedisDB()
 
-    kvs := map[string]string{
-        "hello": "world", 
-        "你好": "world世界",
-        "AGX29mAYx7": `func main() { fmt.Println("hello world") }`,
-    }
-    for key, val := range kvs {
-        if err := setV(key, []byte(val)); err != nil {
+    var err error
+    var shorts []string = make([]string, 0)
+
+	contents := []string{
+        "world",
+         "world世界",
+        `func main() { fmt.Println("hello world") }`,
+	}
+
+	for _, content := range contents {
+        long, err0 := long(content)
+        short, err1 := short(content)
+        // append short to shorts
+        shorts = append(shorts, short)
+        err2 := setV(long, short, content)
+        err = errors.Join(err0, err1, err2)
+        if err != nil {
             t.Error(err)
         }
+	}
+
+    if len(shorts) != 3 {
+        t.Errorf("got number of shorts: [%d], want: [3]", len(shorts))
     }
 
-    for key, _ := range kvs {
-        if _, err := getV(key); err != nil {
-            t.Error(err)
-        } 
-    }
+	for index, short := range shorts {
+        content, err := getV(short);
+		if err != nil {
+			t.Error(err)
+		}
+        if content != contents[index] {
+            t.Errorf("content of key: [%s], got: [%s], want: [%s]", short, content, contents[index])
+        }
+
+	}
 }
