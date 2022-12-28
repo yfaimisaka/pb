@@ -155,3 +155,8 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 	rc.SetWriteDeadline(time.Time{})
 	w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
 }
+
+// === try to solve http force redirect ===
+// func redirectToTls(w http.ResponseWriter, r *http.Request) {
+//     http.Redirect(w, r, "https://aimisaka.site:443" + r.RequestURI, http.StatusMovedPermanently)
+// }
