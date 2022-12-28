@@ -1,0 +1,23 @@
+version: '3'
+services:
+  pb:
+    image: alpine
+    container_name: pb
+    ports:
+      - "80:80"
+    volumes:
+      - ./pb:/var/www/html/pb
+    links:
+      - redis
+    command: sh -c "chmod +x /var/www/html/pb; /var/www/html/pb"
+    depends_on:
+      - redis
+  redis:
+    image: redis:6.2.8-alpine
+    restart: "no"
+    container_name: redis
+    ports:
+      - "52842:6379"
+    volumes:
+      - ./data:/data
+    command: redis-server --appendonly yes --bind 127.0.0.1 redis --requirepass somepwd
