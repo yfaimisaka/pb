@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+
 	// "io/ioutil"
 	"net/http"
 	"strings"
@@ -78,20 +79,18 @@ func contentByPbid(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 			"pbid":   pbid,
 		},
 	)
+
 	// === serve for static resources like css, js ===
-	// if strings.Contains(pbid, "prism") {
+    // as the /static/xxx will conflict wiht /:pbid/:lan, 
+    // so use this way to solve static file (ugly though :<)
+	// if slices.Contains[string](statics, pbid) {
 	//     // LOG
 	//     myLog.WithFields(
 	//         logrus.Fields{
-	//         "method": "handlers.go: contentByPbid",
+	//         "method": "handlers.go: contentByPbidHighLight",
+    //            "resource": pbid,
 	//     },).Info("try to get static resources")
 	//     http.ServeFile(w, r, pbid)
-	//     // w.Header().Write()
-	//     // fbytes, err0 := ioutil.ReadFile(pbid)
-	//     // w.WriteHeader(http.StatusOK)
-	//     // w.Header().Set("Content-Type", "application/octet-stream")
-	//     // w.Write(fbytes)
-	//     // err = errors.Join(err0)
 	//     return
 	// }
 
@@ -135,6 +134,7 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 			"theme":  theme,
 		},
 	).Info("")
+
 
 	if len(pbid) > 5 {
 		var err1 error
