@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"text/template"
 
 	// "io/ioutil"
 	"net/http"
@@ -13,6 +14,11 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/sirupsen/logrus"
 )
+
+type pbTmpl struct {
+	theme        string
+	pasteContent string
+}
 
 func normalPaste(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	var err error
@@ -78,17 +84,17 @@ func contentByPbid(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 			"method": "handlers.go: contentByPbid",
 			"pbid":   pbid,
 		},
-	)
+	).Info("")
 
 	// === serve for static resources like css, js ===
-    // as the /static/xxx will conflict wiht /:pbid/:lan, 
-    // so use this way to solve static file (ugly though :<)
+	// as the /static/xxx will conflict wiht /:pbid/:lan,
+	// so use this way to solve static file (ugly though :<)
 	// if slices.Contains[string](statics, pbid) {
 	//     // LOG
 	//     myLog.WithFields(
 	//         logrus.Fields{
 	//         "method": "handlers.go: contentByPbidHighLight",
-    //            "resource": pbid,
+	//            "resource": pbid,
 	//     },).Info("try to get static resources")
 	//     http.ServeFile(w, r, pbid)
 	//     return
@@ -108,9 +114,9 @@ func contentByPbid(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		w.WriteHeader(http.StatusOK)
 		myLog.Error(err)
 	}
-    
-    // set default contentype, prevent xss hack
-    w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+
+	// set default contentype, prevent xss hack.
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 	rc := http.NewResponseController(w)
 	rc.SetWriteDeadline(time.Time{})
@@ -138,7 +144,6 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 		},
 	).Info("")
 
-
 	if len(pbid) > 5 {
 		var err1 error
 		content, err1 = getV(pbid)
@@ -149,16 +154,29 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 		content, err3 = getV(long)
 		err = errors.Join(err2, err3)
 	}
+
+	pbtmp := pbTmpl{
+		theme:        theme,
+		pasteContent: content,
+	}
+	// set default contentype
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	// <Deprecated>
+	// use template instead of pure text html.
+	// rc := http.NewResponseController(w)
+	// rc.SetWriteDeadline(time.Time{})
+	// w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
+
+	pbtmpl, err4 := template.ParseFiles("./pbtmpl.tmpl")
+	err = errors.Join(err4)
+
+    err5 := pbtmpl.Execute(w, pbtmp)
+	err = errors.Join(err5)
 	if err != nil {
 		w.WriteHeader(http.StatusOK)
 		myLog.Error(err)
 	}
-
-    // set default contentype, prevent xss hack
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	rc := http.NewResponseController(w)
-	rc.SetWriteDeadline(time.Time{})
-	w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
 }
 
 // === try to solve http force redirect ===
