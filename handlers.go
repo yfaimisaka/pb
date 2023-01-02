@@ -108,6 +108,9 @@ func contentByPbid(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		w.WriteHeader(http.StatusOK)
 		myLog.Error(err)
 	}
+    
+    // set default contentype, prevent xss hack
+    w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 	rc := http.NewResponseController(w)
 	rc.SetWriteDeadline(time.Time{})
@@ -151,6 +154,8 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 		myLog.Error(err)
 	}
 
+    // set default contentype, prevent xss hack
+    w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	rc := http.NewResponseController(w)
 	rc.SetWriteDeadline(time.Time{})
 	w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
