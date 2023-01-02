@@ -173,7 +173,7 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 	// rc.SetWriteDeadline(time.Time{})
 	// w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
 
-	pbtmpl, err4 := template.New("pbtmpl.tmpl").Delims("{[", "]}").ParseFiles("./pbtmpl.tmpl")
+	pbtmpl, err4 := template.New("pbtmpl.html").Delims("{[", "]}").ParseFiles("./pbtmpl.html")
     err = errors.Join(err4)
 
     err5 := pbtmpl.Execute(w, pbtmp)
