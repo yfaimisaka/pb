@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <title>pb</title>
-        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/%s.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/{[.Theme]}.min.css">
         <link rel="apple-touch-icon" sizes="57x57" href="//img.aimisaka.site/pb/apple-icon-57x57.png">
         <link rel="apple-touch-icon" sizes="60x60" href="//img.aimisaka.site/pb/apple-icon-60x60.png">
         <link rel="apple-touch-icon" sizes="72x72" href="//img.aimisaka.site/pb/apple-icon-72x72.png">
@@ -28,8 +28,8 @@
         </style>
     </head>
     <body>
-        <pre><code class="language-" + {{- .theme }}>
-{{- .pasteContent -}}
+        <pre><code class="language-{[.Lan]}">
+{[.PasteContent]}
         </code></pre>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
         <script>hljs.highlightAll();</script>
