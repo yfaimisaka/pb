@@ -4,7 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"text/template"
+    // use html/template instead of text/template to prevent xss..
+	"html/template"
 
 	// "io/ioutil"
 	"net/http"
@@ -16,8 +17,9 @@ import (
 )
 
 type pbTmpl struct {
-	theme        string
-	pasteContent string
+    Lan          string
+	Theme        string
+	PasteContent string
 }
 
 func normalPaste(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
@@ -115,8 +117,11 @@ func contentByPbid(w http.ResponseWriter, r *http.Request, ps httprouter.Params)
 		myLog.Error(err)
 	}
 
-	// set default contentype, prevent xss hack.
-	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+    // if find javascript
+    if len(content) < 100 && strings.Contains(content, "script") {
+        // set html to plain, prevent xss hack.
+        w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+    }
 
 	rc := http.NewResponseController(w)
 	rc.SetWriteDeadline(time.Time{})
@@ -156,8 +161,8 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 	}
 
 	pbtmp := pbTmpl{
-		theme:        theme,
-		pasteContent: content,
+		Theme:        theme,
+		PasteContent: content,
 	}
 	// set default contentype
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -168,8 +173,8 @@ func contentByPbidHighLight(w http.ResponseWriter, r *http.Request, ps httproute
 	// rc.SetWriteDeadline(time.Time{})
 	// w.Write(stringToBytes(fmt.Sprintf(hlTemplate, theme, lan, content)))
 
-	pbtmpl, err4 := template.ParseFiles("./pbtmpl.tmpl")
-	err = errors.Join(err4)
+	pbtmpl, err4 := template.New("pbtmpl.tmpl").Delims("{[", "]}").ParseFiles("./pbtmpl.tmpl")
+    err = errors.Join(err4)
 
     err5 := pbtmpl.Execute(w, pbtmp)
 	err = errors.Join(err5)
