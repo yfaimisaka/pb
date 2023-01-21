@@ -1,1 +1,1 @@
-# lightweight pastebin using go
+## lightweight pastebin using go, still in development.
